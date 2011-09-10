@@ -1,0 +1,12 @@
+:key: API_KEY
+:secret: API_SECRET
+
+# nuinhetbwtest
+:expected: 
+  :access_token: 144918754-W1eQGZDq7WEZbnlsE7GHq2aU2sEz00Hkjq5njEZ5
+  :access_secret: LnEZaRNfaeuGMUVjZZw3Y8CHXFXKRZIOzcGc6IfVM
+
+# nuinhetbwtest
+:upcoming: 
+  :access_token: 144918754-W1eQGZDq7WEZbnlsE7GHq2aU2sEz00Hkjq5njEZ5
+  :access_secret: LnEZaRNfaeuGMUVjZZw3Y8CHXFXKRZIOzcGc6IfVM
