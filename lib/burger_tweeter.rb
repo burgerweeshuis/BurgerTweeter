@@ -4,7 +4,11 @@ require 'open-uri'
 require 'simple-rss'
 
 # load config stuff
-Dir[File.expand_path(File.join(File.dirname(__FILE__),'..','config','initializers','**','*.rb'))].each {|f| require f}
+begin
+  Dir[File.expand_path(File.join(File.dirname(__FILE__),'..','config','initializers','**','*.rb'))].each {|f| require f}
+rescue Errno::ENOENT => e
+  raise "\n\e[1;37;44m\n\nPlease create the proper config file!\n\n#{e.message}\n\n\e[0m"
+end
 
 # add some extra tags defined in stream
 SimpleRSS.item_tags << 'event:date'
