@@ -7,18 +7,12 @@ require 'simple-rss'
 Dir[File.expand_path(File.join(File.dirname(__FILE__),'..','config','initializers','**','*.rb'))].each {|f| require f}
 
 # add some extra tags defined in stream
+SimpleRSS.item_tags << 'event:date'
 SimpleRSS.item_tags << 'event:title'
 SimpleRSS.item_tags << 'event:sub_title'
 SimpleRSS.item_tags << 'event:opens_at'
 SimpleRSS.item_tags << 'event:starts_at'
 SimpleRSS.item_tags << 'event:published_at'
-
-rss = SimpleRSS.parse open(FEED[:url])
-
-# puts rss.channel.title # => "Slashdot"
-# puts rss.channel.link # => "http://slashdot.org/&quot;
-puts rss.items.first.to_yaml
-# puts rss.items.first.pubDate
 
 def snip(url)
   begin
@@ -28,27 +22,30 @@ def snip(url)
   end
 end
 
-# puts snip(rss.items.first.link)
-
-def tweet_upcoming_items(rss)
+def tweet_upcoming_items
+  rss = SimpleRSS.parse open(FEED[:upcoming_url])
   rss.items.each do |event|
     opens_at = Time.parse(event.event_opens_at).utc
     if (opens_at - Time.now.utc) < 3700 # kleiner dan 1 uur
       time = "#{opens_at.hour}:#{"%02d" % opens_at.min}"
       string = "Vandaag in @burgerweeshuis om #{time}: #{event.event_title}, #{snip(event.link)}"
-      tweet_it(:upcoming, string, event)
+      tweet_it(:upcoming, string)
     end
   end
 end
 
 def tweet_expected_items
-  snipped_link = snip(link)
-  string = "Verwacht: #{item.title}, #{item.date.day} #{NL_ABBR_MONTHNAMES[item.date.month]} #{item.date.year}"[0...(120-snipped_link.size)]
-  string << ", #{snipped_link}"
-  tweet_it(:expected, string)
+  rss = SimpleRSS.parse open(FEED[:expected_url])
+  rss.items.each do |event|
+    snipped_link = snip(event.link)
+    date = Time.parse(event.event_date).utc
+    string = "Verwacht in @burgerweeshuis: #{event.event_title}, #{date.day} #{NL_ABBR_MONTHNAMES[date.month]} #{date.year}"[0...(120-snipped_link.size)]
+    string << ", #{snipped_link}"
+    tweet_it(:expected, string)
+  end
 end
 
-def tweet_it(account_type, string, event = nil)
+def tweet_it(account_type, string)
   raise ArgumentError "Invalid Account Type (#{account_type})" unless [:upcoming, :expected].include?(account_type)
   # puts "Passing to twitter: '#{string}'" 
   # oauth = Twitter::OAuth.new(TWITTER[:key], TWITTER[:secret])
@@ -62,4 +59,5 @@ def tweet_it(account_type, string, event = nil)
   puts "Should pass to twitter: '#{string}'" 
 end
 
-tweet_upcoming_items(rss)
+tweet_upcoming_items
+tweet_expected_items

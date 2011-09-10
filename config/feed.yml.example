@@ -1,0 +1,2 @@
+:upcoming_url: http://burgerweeshuis.nl/api/v1/events.rss
+:expected_url: http://burgerweeshuis.nl/api/v1/events/confirmed.rss
