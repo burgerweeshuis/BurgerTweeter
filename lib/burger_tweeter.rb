@@ -31,7 +31,7 @@ def upcoming_items
   rss.items.each do |event|
     opens_at = Time.parse(event.event_date).utc
     should_we_tweet = (opens_at - Time.now.utc)
-    if should_we_tweet < 3600 && should_we_tweet > 0 # kleiner dan 1 uur
+    if should_we_tweet < APP_ENV[:interval] && should_we_tweet > 0 # kleiner dan 1 uur
       snipped_link = snip(event.link)
       time = "#{opens_at.hour}:#{"%02d" % opens_at.min}"
       string = "Vandaag in @burgerweeshuis om #{time}: #{event.title}"[0...(120-snipped_link.size)]
@@ -45,7 +45,7 @@ def expected_items
   rss = SimpleRSS.parse open(FEED[:expected_url])
   rss.items.each do |event|
     should_we_tweet = (event.pubDate - Time.now.utc)
-    if should_we_tweet < 0 && should_we_tweet > -3600 # kleiner dan 1 uur
+    if should_we_tweet < 0 && should_we_tweet > - APP_ENV[:interval] # kleiner dan 1 uur
       date = Time.parse(event.event_date).utc
       snipped_link = snip(event.link)
       string = "Verwacht in @burgerweeshuis: #{event.title}, #{date.day} #{NL_ABBR_MONTHNAMES[date.month]} #{date.year}"[0...(120-snipped_link.size)]
